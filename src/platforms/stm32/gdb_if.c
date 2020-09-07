@@ -25,6 +25,7 @@
 #include "general.h"
 #include "cdcacm.h"
 #include "gdb_if.h"
+#include "srtt.h"
 
 static uint32_t count_out;
 static uint32_t count_in;
@@ -79,6 +80,8 @@ void gdb_usb_out_cb(usbd_device *dev, uint8_t ep)
 
 static void gdb_if_update_buf(void)
 {
+        srtt_do_poll();
+
 	while (cdcacm_get_config() != 1);
 #ifdef STM32F4
 	asm volatile ("cpsid i; isb");
@@ -129,4 +132,3 @@ unsigned char gdb_if_getchar_to(int timeout)
 
 	return -1;
 }
-

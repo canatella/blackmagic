@@ -21,6 +21,7 @@
 #define field_offset(struc, field) ((size_t)((char*)&((struc*)(0))->field))
 #define end_of_array(array) (&(array)[sizeof(array)/sizeof((array)[0])])
 
+uint32_t last_poll_time = 0;
 typedef struct srtt_buf srtt_buf_t;
 
 struct srtt_buf {
@@ -197,6 +198,7 @@ bool srtt_scan(target *t)
 		}
 	}
 
+        gdb_outf("No RTT control block found.\n");
 	return false;
 }
 
@@ -384,12 +386,26 @@ static bool srtt_send_down_buffer(target *t, int argc, const char **argv) {
 	return false;
 }
 
+static bool srtt_poll(target *t, int argc, const char **argv) {
+        (void) argc;
+        (void) argv;
+
+        // read data from buffers
+	for (size_t i = 0; i < (size_t)srtt_cb.up_buffers; i++) {
+		if (srtt_attached[i]) {
+			srtt_read_up_buffer(t, i);
+		}
+	}
+	return false;
+}
+
 static const cmd_t srtt_cmds[] = {
 	{"srtt_buffers", srtt_display_buffers, "Display list of available RTT buffers"},
 	{"srtt_attach", srtt_attach_buffer, "Attach to UP buffer to receive outgoing device messages"},
 	{"srtt_detach", srtt_detach_buffer, "Detach from UP buffer"},
 	{"srtt_recv", srtt_receive_up_buffer, "Receive text from UP buffer"},
 	{"srtt_send", srtt_send_down_buffer, "Send text to DOWN buffer"},
+        {"srtt_poll", srtt_poll, "Poll attached buffers"},
 };
 
 int srtt_command(target *t, int argc, const char **argv) {
@@ -412,13 +428,23 @@ void srtt_command_help(void) {
 	}
 }
 
-void srtt_poll(void) {
-	target *t = srtt_target;
+void srtt_do_poll(void) {
+        if (!running_status)
+                return;
+
+        // poll rtt every second
+        uint32_t now = platform_time_ms();
+        if (now - last_poll_time < 300)
+            return;
+
+        last_poll_time = now;
+
+        target *t = srtt_target;
 
 	// read data from buffers
 	for (size_t i = 0; i < (size_t)srtt_cb.up_buffers; i++) {
 		if (srtt_attached[i]) {
-			srtt_read_up_buffer(t, i);
+                        srtt_read_up_buffer(t, i);
 		}
 	}
 }
