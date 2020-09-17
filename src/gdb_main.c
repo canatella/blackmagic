@@ -35,6 +35,7 @@
 #include "command.h"
 #include "crc32.h"
 #include "morse.h"
+#include "srtt.h"
 
 enum gdb_signal {
 	GDB_SIGINT = 2,
@@ -261,6 +262,7 @@ int gdb_main_loop(struct target_controller *tc, bool in_syscall)
 		case 'D':	/* GDB 'detach' command. */
 			if(cur_target) {
 				SET_RUN_STATE(1);
+                                srtt_detach();
 				target_detach(cur_target);
 			}
 			last_target = cur_target;
