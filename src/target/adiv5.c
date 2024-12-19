@@ -485,6 +485,10 @@ void adiv5_dp_init(adiv5_debug_port_s *const dp)
 	if (dp->target_designer_code == JEP106_MANUFACTURER_NXP)
 		lpc55_dp_prepare(dp);
 
+	if (dp->target_designer_code == JEP106_MANUFACTURER_NORDIC && dp->target_partno == 0x70U) {
+		nrf5340_prepare(dp);
+	}
+
 	/* Probe for APs on this DP */
 	size_t invalid_aps = 0U;
 	dp->refcnt++;

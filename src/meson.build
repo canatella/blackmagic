@@ -53,7 +53,7 @@ bmd_core_sources = [
 	libbmd_core_sources,
 ]
 
-bmd_core_args = []
+bmd_core_args = ['-DPLATFORM_HAS_CUSTOM_COMMANDS']
 libbmd_core_args = [
 	'-DENABLE_DEBUG=1',
 ]

@@ -79,6 +79,7 @@ bool msp432e4_probe(target_s *target);
 bool msp432p4_probe(target_s *target);
 bool mspm0_probe(target_s *target);
 bool nrf51_probe(target_s *target);
+bool nrf5340_probe(target_s *target);
 bool nrf54l_probe(target_s *target);
 bool nrf91_probe(target_s *target);
 bool puya_probe(target_s *target);
@@ -106,5 +107,6 @@ bool stm32wb0_probe(target_s *target);
 bool zynq7_probe(target_s *target);
 
 void lpc55_dp_prepare(adiv5_debug_port_s *dp);
+void nrf5340_prepare(adiv5_debug_port_s *dp);
 
 #endif /* TARGET_TARGET_PROBE_H */
